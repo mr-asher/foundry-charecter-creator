@@ -1,4 +1,4 @@
-export const MODULE_ID = "foundryvtt-dnd-charecter-creator";
+export const MODULE_ID = "foundryvtt-dnd-character-creator-diagnostics";
 
 export const ABILITY_KEYS = ["str", "dex", "con", "int", "wis", "cha"];
 

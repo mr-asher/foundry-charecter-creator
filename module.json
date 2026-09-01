@@ -1,8 +1,8 @@
 {
-  "id": "foundryvtt-dnd-charecter-creator",
-  "title": "D&D Character Creator",
-  "description": "A step-by-step character creation wizard that reads classes, species, backgrounds, and equipment straight from your installed dnd5e compendiums.",
-  "version": "0.8.0",
+  "id": "foundryvtt-dnd-character-creator-diagnostics",
+  "title": "D&D Character Creator Diagnostics",
+  "description": "A separately installable diagnostic build of D&D Character Creator. Do not enable it alongside the original module in the same world.",
+  "version": "0.8.0-diagnostics.1",
   "compatibility": {
     "minimum": "13",
     "verified": "14"
@@ -25,10 +25,10 @@
       { "id": "dnd5e", "type": "system", "compatibility": { "minimum": "3.0" } }
     ]
   },
-  "url": "https://github.com/plaksiy/foundry-charecter-creator",
-  "manifest": "https://github.com/plaksiy/foundry-charecter-creator/releases/latest/download/module.json",
-  "download": "https://github.com/plaksiy/foundry-charecter-creator/releases/latest/download/module.zip",
-  "bugs": "https://github.com/plaksiy/foundry-charecter-creator/issues",
-  "readme": "https://github.com/plaksiy/foundry-charecter-creator/blob/main/README.md",
-  "license": "https://github.com/plaksiy/foundry-charecter-creator/blob/main/LICENSE"
+  "url": "https://github.com/mr-asher/foundry-charecter-creator",
+  "manifest": "https://github.com/mr-asher/foundry-charecter-creator/releases/download/diagnostics-v0.8.0-1/module.json",
+  "download": "https://github.com/mr-asher/foundry-charecter-creator/releases/download/diagnostics-v0.8.0-1/module.zip",
+  "bugs": "https://github.com/mr-asher/foundry-charecter-creator/issues",
+  "readme": "https://github.com/mr-asher/foundry-charecter-creator/blob/main/README.md",
+  "license": "https://github.com/mr-asher/foundry-charecter-creator/blob/main/LICENSE"
 }
