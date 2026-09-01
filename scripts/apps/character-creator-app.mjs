@@ -40,6 +40,7 @@ import {
   listPlayerVisiblePacks,
   setPlayerSourceVisibility
 } from "../services/compendium-sources.mjs";
+import { formatCompendiumScanReport } from "../services/compendium-diagnostics.mjs";
 import { formatGp, itemPriceInGp, redenominateGp, totalGpEquivalent } from "../services/currency.mjs";
 import {
   areFeatsAllowedAtLevel,
@@ -2540,7 +2541,8 @@ export class CharacterCreatorApp extends HandlebarsApplicationMixin(ApplicationV
       `Current step: ${currentStep}`,
       `Draft actor: ${this.draft?.actor?.name ?? "n/a"} (${this.draft?.actor?.uuid ?? "n/a"})`,
       `Level Up mode: ${this.levelUp}`,
-      `Browser: ${navigator.userAgent}`
+      `Browser: ${navigator.userAgent}`,
+      formatCompendiumScanReport()
     ];
     const text = lines.join("\n");
     try {

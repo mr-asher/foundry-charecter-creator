@@ -1,0 +1,8 @@
+{
+  "name": "foundry-charecter-creator",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  }
+}

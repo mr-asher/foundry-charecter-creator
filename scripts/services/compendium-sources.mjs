@@ -1,4 +1,7 @@
 import { MODULE_ID } from "../constants.mjs";
+import { logCompendiumScan } from "./compendium-diagnostics.mjs";
+
+const now = () => globalThis.performance?.now() ?? Date.now();
 
 /**
  * dnd5e Item document "type" values relevant to each wizard step.
@@ -100,11 +103,13 @@ function matchesRuleset(itemRuleset, rulesetVersions) {
  * @returns {Promise<object[]>}
  */
 export async function getStepItems(stepType, rulesetVersions) {
+  const scanStarted = now();
   const itemTypes = STEP_ITEM_TYPES[stepType];
   if (!itemTypes) throw new Error(`${MODULE_ID} | Unknown step type "${stepType}"`);
 
   const config = getPackConfig();
   const results = [];
+  const packMetrics = [];
 
   for (const pack of game.packs) {
     if (pack.documentName !== "Item") continue;
@@ -112,21 +117,35 @@ export async function getStepItems(stepType, rulesetVersions) {
     if (!isPackVisibleToPlayer(pack)) continue;
 
     const packRulesetTag = config[pack.collection]?.ruleset ?? "auto";
+    const metrics = {
+      id: pack.collection,
+      title: pack.title,
+      indexMs: 0,
+      entries: 0,
+      matches: 0,
+      documentFetches: 0,
+      documentMs: 0
+    };
+    packMetrics.push(metrics);
     // A handful of extra fields, cheap to request via the index (no full-document fetch
     // needed) - getIndex() populates these without loading the whole item, unlike a
     // class/species's own `system.description` (which is either an @Embed reference to
     // a Journal page or dense rules-table HTML, not usable as a plain flavor sentence,
     // so deliberately not fetched here). Harmless for types that don't have a given
     // field - it's just absent from that entry.
+    const indexStarted = now();
     const index = await pack.getIndex({
       fields: ["system.source", "system.type", "system.hd.denomination", "system.primaryAbility.value", "system.movement.walk"]
     });
+    metrics.indexMs = now() - indexStarted;
+    metrics.entries = index.size;
 
     for (const entry of index) {
       if (!itemTypes.includes(entry.type)) continue;
 
       const itemRuleset = resolveItemRuleset(entry, packRulesetTag);
       if (!matchesRuleset(itemRuleset, rulesetVersions)) continue;
+      metrics.matches++;
 
       // The human-readable source book label ("SRD 5.1", "PHB 2024", ...) is a derived
       // getter (system.source.label) that only exists on a fully-prepared Item document -
@@ -136,7 +155,10 @@ export async function getStepItems(stepType, rulesetVersions) {
       // runs for the small already-filtered survivor set (a step's real class/species/
       // background/feat list, a few dozen at most), and pack.getDocument caches after
       // the first load, so repeat renders don't refetch.
+      const documentStarted = now();
       const doc = await pack.getDocument(entry._id);
+      metrics.documentMs += now() - documentStarted;
+      metrics.documentFetches++;
       const bookLabel = doc?.system?.source?.label ?? null;
 
       results.push({
@@ -190,7 +212,15 @@ export async function getStepItems(stepType, rulesetVersions) {
     });
   }
 
-  return deduplicateByNameAndRuleset(results);
+  const deduplicated = deduplicateByNameAndRuleset(results);
+  logCompendiumScan({
+    stepType,
+    rulesets: rulesetVersions,
+    totalMs: now() - scanStarted,
+    resultCount: deduplicated.length,
+    packs: packMetrics
+  });
+  return deduplicated;
 }
 
 /**
